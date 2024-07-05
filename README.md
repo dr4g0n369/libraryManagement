@@ -16,6 +16,11 @@ Before you begin, ensure you have met the following requirements:
 git clone https://github.com/dr4g0n369/libraryManagement.git
 cd libraryManagement
 cp config/.env .env
+```
+
+Add the required details (Database name, password...) in the `.env` file.
+
+```
 docker-compose build --no-cache
 ```
 ## Usage
