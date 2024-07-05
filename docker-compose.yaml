@@ -1,0 +1,64 @@
+version: "3.8"
+services:
+  db:
+    platform: linux/amd64
+    image: mysql:8.3
+    networks:
+      app_network:
+        ipv4_address: 192.168.92.23
+    restart: always
+    ports:
+      - $DB_PORT:$DB_PORT
+    environment:
+      - MYSQL_ROOT_PASSWORD=$DB_PASS
+      - MYSQL_DATABASE=$DB_NAME
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=$DB_PASS
+      - MYSQL_TCP_PORT=$DB_PORT
+    expose:
+      - $DB_PORT
+    volumes:
+      - db_data:/var/lib/mysql
+  library:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - $WEB_PORT:$WEB_PORT
+    environment:
+      - WEB_PORT=$WEB_PORT
+      - DB_NAME=$DB_NAME
+      - DB_USER=$DB_USER
+      - DB_PASS=$DB_PASS
+      - DB_PORT=$DB_PORT
+      - DB_IPADDR=$DB_IPADDR
+    depends_on:
+      - db
+    networks:
+      app_network:
+        ipv4_address: 192.168.92.22
+  migrate:
+    image: migrate/migrate
+    networks:
+      app_network:
+        ipv4_address: 192.168.92.21
+    depends_on:
+      - db
+    volumes:
+      - ./database/migration:/migration
+    environment:
+      - DB_NAME=$DB_NAME
+      - DB_USER=$DB_USER
+      - DB_PASS=$DB_PASS
+      - DB_PORT=$DB_PORT
+      - DB_IPADDR=$DB_IPADDR
+    command: ["-path", "/migration", "-database",  "mysql://$DB_USER:$DB_PASS@($DB_IPADDR:$DB_PORT)/$DB_NAME?parseTime=true", "-verbose", "up"]
+volumes:
+  db_data:
+networks:
+  app_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.92.0/24"

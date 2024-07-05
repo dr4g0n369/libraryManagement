@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Library Management System</h1>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="/home/issuedbooks">My Issued Books</a></li>
+                <li><a href="/home/availablebooks">Available Books</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+        {{if .Result}}
+            <div id="Message" class="messageContainer hidden-message">
+            </div>
+        {{else}}
+            <div id="Message" class="messageContainer">
+                <span class="close-btn" onclick="this.parentElement.classList.add('hidden-message')">&times;</span>
+                <strong>Empty!</strong> No books found.
+            </div>
+        {{end}}
+        <main>
+            {{if eq .Page "issuedbooks"}}
+                {{if .Result}}
+                    <table id="booksTable">
+                        <thead>
+                            <tr>
+                                <th>Book ID</th>
+                                <th>Name</th>
+                                <th>Author</th>
+                                <th class="action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {{range .Result}}
+                            <tr id="book-{{.BookId}}">
+                                <td>{{.BookId}}</td>
+                                <td>{{.Name}}</td>
+                                <td>{{.Author}}</td>
+                                <td id="action" class="action" onclick="returnBook({{.BookId}})">Return</td>
+                            </tr>
+                        {{end}}
+                        </tbody>
+                    </table>
+                {{end}}
+            {{else if eq .Page "availablebooks"}}
+                {{if .Result}}
+                    <table id="booksTable">
+                        <thead>
+                            <tr>
+                                <th>Book ID</th>
+                                <th>Name</th>
+                                <th>Author</th>
+                                <th>Shelf</th>
+                                <th class="action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {{range .Result}}
+                            {{if eq .IssuedBy 0}}
+                                <tr id="book-{{.BookId}}">
+                                    <td>{{.BookId}}</td>
+                                    <td>{{.Name}}</td>
+                                    <td>{{.Author}}</td>
+                                    <td>{{.Shelf}}</td>
+                                    <td id="action" class="action" onclick="issueBook({{.BookId}})">Issue</td>
+                                </tr>
+                            {{end}}
+                        {{end}}
+                        </tbody>
+                    </table>
+                {{end}}
+            {{end}}
+        </main>
+    </div>
+    <script src="/static/js/scripts.js"></script>
+</body>
+</html>
+
