@@ -2,12 +2,13 @@ package helper
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/dr4g0n369/libraryManagement/pkg/types"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var secretKey = []byte("secret-key")
+var secretKey = []byte(os.Getenv("WEB_SECRET"))
 
 func CreateToken(user *types.Login) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
